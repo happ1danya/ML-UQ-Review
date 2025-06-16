@@ -1,5 +1,5 @@
 # ML-UQ-Review
-Review and Performance Evaluation of Uncertainty Quantification in Machine Leaning-Assisted Measurements
+Review and Performance Evaluation of Uncertainty Quantification in Machine Learning-Assisted Measurements
 
 # Kaggle API
 https://www.kaggle.com/docs/api

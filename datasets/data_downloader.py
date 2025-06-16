@@ -1,5 +1,8 @@
 import kaggle
 
+# Authenticate using Kaggle API before downloading datasets
+kaggle.api.authenticate()
+
 # Download dataset (replace with the dataset name)
 cs = "parisrohan/credit-score-classification"
 kaggle.api.dataset_download_files(cs, path="./datasets/credit_score", unzip=True)
