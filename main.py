@@ -1,7 +1,7 @@
 import numpy as np
 import os 
 
-from utils import ( 
+from utils import (
     parse_args,
     load_data,
     run_mc_dropout,
@@ -11,8 +11,9 @@ from utils import (
     compute_truth_flags,
     build_bins_from_arrays,
     compute_overall_metrics,
+    summarise_metric_diffs,
     save_results_json,
-    plot_all
+    plot_all,
 )
 
 
@@ -49,6 +50,7 @@ def main():
 
     # Compute overall metrics and store exact arrays
     metrics = compute_overall_metrics(y, preds0, preds_mc)
+    diff_summary = summarise_metric_diffs(u_lists, m_lists)
 
     # 5.  Plot everything
     output_dir = os.path.join(
@@ -59,7 +61,7 @@ def main():
 
     plot_all(u_lists, m_lists, c_lists, output_dir, prefix)
     json_path = os.path.join(output_dir, f"{prefix}_results.json")
-    save_results_json(u_lists, m_lists, c_lists, metrics, json_path)
+    save_results_json(u_lists, m_lists, c_lists, metrics, diff_summary, json_path)
     print("Done.")
 
 if __name__ == "__main__":

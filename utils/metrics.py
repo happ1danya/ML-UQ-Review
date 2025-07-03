@@ -134,7 +134,48 @@ def compute_overall_metrics(y_onehot, preds0, preds_mc):
     return metrics
 
 
-def save_results_json(u_lists, m_lists, c_lists, metrics, out_path):
+def summarise_metric_diffs(u_lists, m_lists, threshold=0.9):
+    """Summarise per-bin metric differences against MP."""
+
+    metric_names = [
+        "Accuracy",
+        "Macro Precision", "Micro Precision", "Weighted Precision",
+        "Macro Recall", "Micro Recall", "Weighted Recall",
+        "Macro F1", "Micro F1", "Weighted F1",
+    ]
+
+    base_acc = np.asarray(u_lists['MP'])
+    base_m   = np.asarray(m_lists['MP'])
+
+    summaries = {}
+    for method, acc in u_lists.items():
+        if method == 'MP':
+            continue
+        acc = np.asarray(acc)
+        metr = np.asarray(m_lists[method])
+
+        diffs = np.vstack([acc - base_acc, metr - base_m])
+        summary = {}
+        for name, arr in zip(metric_names, diffs):
+            arr = np.where(np.isnan(arr), 0.0, arr)
+            avg_all = float(np.mean(arr)) if arr.size else float('nan')
+            max_all = float(np.max(arr)) if arr.size else float('nan')
+            mask = acc > threshold
+            if mask.any():
+                avg90 = float(np.mean(arr[mask]))
+            else:
+                avg90 = float('nan')
+            summary[name] = {
+                'avg90': avg90,
+                'avg_all': avg_all,
+                'max_all': max_all,
+            }
+        summaries[method] = summary
+
+    return summaries
+
+
+def save_results_json(u_lists, m_lists, c_lists, metrics, diff_summary, out_path):
     """Save arrays and metric comparisons to a JSON file."""
 
     def conv(d):
@@ -145,6 +186,7 @@ def save_results_json(u_lists, m_lists, c_lists, metrics, out_path):
         'm_lists': conv(m_lists),
         'c_lists': conv(c_lists),
         'overall_metrics': {k: np.asarray(v).tolist() for k, v in metrics.items()},
+        'diff_summary': diff_summary,
     }
 
     mp = metrics.get('MP')
