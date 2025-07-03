@@ -15,7 +15,7 @@ _HATCHES     = ['/', '\\', 'o', '+', '*', '.', 'x']
 # ---------------------------------------------------------------------
 # 1) Generic 2-D line plot
 # ---------------------------------------------------------------------
-def plot_metric(x, lines, labels, xlabel, ylabel, outpath):
+def plot_metric(x, lines, labels, xlabel, ylabel, outpath_png, outpath_eps):
     """
     Draws a single panel (line plot) with the *exact* visual style
     used in the long, hand-written code block.
@@ -55,7 +55,8 @@ def plot_metric(x, lines, labels, xlabel, ylabel, outpath):
 
     plt.legend(loc='lower left', fontsize=15, ncol=2)
     plt.tight_layout()
-    plt.savefig(outpath, bbox_inches='tight')
+    plt.savefig(outpath_png, bbox_inches='tight')
+    plt.savefig(outpath_eps, bbox_inches='tight')
     plt.close()
 
 
@@ -88,12 +89,9 @@ def plot_all(u_lists, m_lists, counts, output_dir, prefix):
         order,
         'Uncertainty',
         'Accuracy',
-        os.path.join(output_dir, f"{prefix}_acc.png")
+        os.path.join(output_dir, f"{prefix}_acc.png"),
+        os.path.join(output_dir, f"{prefix}_acc.eps")
     )
-    # EPS copy (unchanged style)
-    plt.imread(os.path.join(output_dir, f"{prefix}_acc.png"))  # preload (matplotlib quirk)
-    plt.savefig(os.path.join(output_dir, f"{prefix}_acc.eps"), format='eps',
-                bbox_inches='tight')
     plt.close()
 
     # ---- Precision / Recall / F1 (macro, micro, weighted) -----------
@@ -116,14 +114,9 @@ def plot_all(u_lists, m_lists, counts, output_dir, prefix):
             order,
             'Uncertainty',
             ylabel,
-            os.path.join(output_dir, f"{prefix}_{tag}_{['mac','mic','wei'][idx%3]}.png")
+            os.path.join(output_dir, f"{prefix}_{tag}_{['mac','mic','wei'][idx%3]}.png"),
+            os.path.join(output_dir, f"{prefix}_{tag}_{['mac','mic','wei'][idx%3]}.eps")
         )
-        # matching EPS
-        plt.imread(os.path.join(output_dir,
-                                f"{prefix}_{tag}_{['mac','mic','wei'][idx%3]}.png"))
-        plt.savefig(os.path.join(output_dir,
-                                 f"{prefix}_{tag}_{['mac','mic','wei'][idx%3]}.eps"),
-                    format='eps', bbox_inches='tight')
         plt.close()
 
     # ---- BAR plot: instance counts (styled like reference) ------------
