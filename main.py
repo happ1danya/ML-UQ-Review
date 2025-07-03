@@ -10,6 +10,8 @@ from utils import (
     std_predicted_prob,
     compute_truth_flags,
     build_bins_from_arrays,
+    compute_overall_metrics,
+    save_results_json,
     plot_all
 )
 
@@ -45,6 +47,9 @@ def main():
         slices=10
     )
 
+    # Compute overall metrics and store exact arrays
+    metrics = compute_overall_metrics(y, preds0, preds_mc)
+
     # 5.  Plot everything
     output_dir = os.path.join(
         'datasets',
@@ -53,6 +58,8 @@ def main():
     prefix = os.path.splitext(os.path.basename(args.model_path))[0]
 
     plot_all(u_lists, m_lists, c_lists, output_dir, prefix)
+    json_path = os.path.join(output_dir, f"{prefix}_results.json")
+    save_results_json(u_lists, m_lists, c_lists, metrics, json_path)
     print("Done.")
 
 if __name__ == "__main__":
