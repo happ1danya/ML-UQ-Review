@@ -39,6 +39,9 @@ Two ways to run it:
   ```
 
 Output plots (PNG and EPS) are written to the corresponding dataset folder.
+In the same directory, a `*_results.json` file captures the exact metric values
+used to generate the figures. It contains the uncertainty bins, per-bin metrics
+and overall performance comparisons against the MP baseline.
 
 ## Directory overview
 - `datasets/` – dataset downloader and downloaded data. After running the downloader, subfolders such as `mnist` or `credit_score` will appear here. Evaluation results from `main.py` are also saved in these folders.
