@@ -1,0 +1,12 @@
+python -m main --dataset avh
+python -m main --dataset ct
+python -m main --dataset cs
+python -m main --dataset fm
+python -m main --dataset fd
+python -m main --dataset gamma
+python -m main --dataset lr
+python -m main --dataset mnist
+python -m main --dataset neo
+python -m main --dataset rt
+python -m main --dataset sd
+python -m main --dataset tweets

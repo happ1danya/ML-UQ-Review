@@ -126,44 +126,51 @@ def plot_all(u_lists, m_lists, counts, output_dir, prefix):
                     format='eps', bbox_inches='tight')
         plt.close()
 
-    # ---- BAR plot: instance counts ----------------------------------
+    # ---- BAR plot: instance counts (styled like reference) ------------
     max_len   = len(next(iter(counts.values())))
     x_bar     = np.arange(0.1, 0.1 * max_len + 0.1, 0.1)
-    bar_width = 0.015
+    bar_width = 0.015  # Same as your reference
 
-    plt.figure(figsize=(6, 4.5), dpi=100)
+    plt.figure(figsize=(8, 5), dpi=100)
     plt.xlabel('Uncertainty Bins', fontsize=20)
     plt.ylabel('Count', fontsize=20)
     plt.xticks(x_bar, fontsize=15, rotation=45)
     plt.yticks(fontsize=15)
-    ymax = max(max(v) for v in counts.values()) + 1
-    plt.ylim(0, ymax)
     plt.grid(True, which='both', linestyle=':', linewidth=0.5, color='gray')
 
+    # Compute max y
+    ymax = max(max(c) for c in counts.values())
+    plt.ylim(0, ymax + 1)
+
+    # Plot bars with symmetric spacing
     bars = []
-    for i, k in enumerate(order):
-        shift = (i - 2) * bar_width         # centre the stacks
+    total_methods = len(order)
+    offsets = np.linspace(-2.5, 2.5, total_methods) * bar_width  # exactly as in your reference
+
+    for i, (method, offset) in enumerate(zip(order, offsets)):
         bars.append(
             plt.bar(
-                x_bar + shift,
-                counts[k],
+                x_bar + offset,
+                counts[method],
                 width=bar_width,
-                color=_DARK_COLS[i],
-                hatch=_HATCHES[i],
+                color=_DARK_COLS[i % len(_DARK_COLS)],
+                hatch=_HATCHES[i % len(_HATCHES)],
                 edgecolor='black',
-                label=k
+                label=method
             )
         )
 
+    # Legend inside top right
     plt.legend(
         handles=bars,
         loc='upper right',
-        fontsize=12,
-        ncol=3,
-        frameon=False
+        fontsize=15,
+        ncol=2
     )
-    plt.tight_layout(rect=[0, 0, 0.85, 1])
-    plt.savefig(os.path.join(output_dir, f"{prefix}_count.png"), bbox_inches='tight')
-    plt.savefig(os.path.join(output_dir, f"{prefix}_count.eps"), format='eps',
-                bbox_inches='tight')
+
+    # Layout & save
+    plt.tight_layout()
+    for ext in ['png', 'eps']:
+        plt.savefig(os.path.join(output_dir, f"{prefix}_count.{ext}"),
+                    format=ext, bbox_inches='tight')
     plt.close()
