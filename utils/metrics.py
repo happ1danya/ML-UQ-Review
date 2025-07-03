@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.metrics import (
     precision_score,
     recall_score,
-    f1_score,
+    f1_score
 )
 import json
 
@@ -158,6 +158,7 @@ def save_results_json(u_lists, m_lists, c_lists, diff_summary, out_path):
         'c_lists': conv(c_lists),
         'diff_summary': diff_summary,
     }
+
 
     with open(out_path, 'w') as f:
         json.dump(data, f, indent=2)
