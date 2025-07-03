@@ -1,7 +1,7 @@
 import numpy as np
 import os 
 
-from utils import ( 
+from utils import (
     parse_args,
     load_data,
     run_mc_dropout,
@@ -10,7 +10,9 @@ from utils import (
     std_predicted_prob,
     compute_truth_flags,
     build_bins_from_arrays,
-    plot_all
+    summarise_metric_diffs,
+    save_results_json,
+    plot_all,
 )
 
 
@@ -45,6 +47,9 @@ def main():
         slices=10
     )
 
+    # Summarise per-bin metric differences
+    diff_summary = summarise_metric_diffs(u_lists, m_lists)
+
     # 5.  Plot everything
     output_dir = os.path.join(
         'datasets',
@@ -53,6 +58,8 @@ def main():
     prefix = os.path.splitext(os.path.basename(args.model_path))[0]
 
     plot_all(u_lists, m_lists, c_lists, output_dir, prefix)
+    json_path = os.path.join(output_dir, f"{prefix}_results.json")
+    save_results_json(u_lists, m_lists, c_lists, diff_summary, json_path)
     print("Done.")
 
 if __name__ == "__main__":

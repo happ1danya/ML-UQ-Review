@@ -2,7 +2,12 @@
 #  Binning helpers (vectorised, safe for empty bins)
 # ---------------------------------------------------------------------
 import numpy as np
-from sklearn.metrics import precision_score, recall_score, f1_score
+from sklearn.metrics import (
+    precision_score,
+    recall_score,
+    f1_score,
+)
+import json
 
 def cal_bin(uc, truth_flags, slices=10, return_rate=True):
     """Per-bin accuracy *or* count, NaN for empty bins."""
@@ -93,4 +98,68 @@ def build_bins_from_arrays(
         m_lists[name] = cal_bin_others(y_true_bins, y_pred_bins)
 
     return u_lists, m_lists, c_lists
+
+
+# ---------------------------------------------------------------------
+#  Additional helpers: JSON output and diff summaries
+# ---------------------------------------------------------------------
+
+
+def summarise_metric_diffs(u_lists, m_lists, threshold=0.9):
+    """Summarise per-bin metric differences against MP."""
+
+    metric_names = [
+        "Accuracy",
+        "Macro Precision", "Micro Precision", "Weighted Precision",
+        "Macro Recall", "Micro Recall", "Weighted Recall",
+        "Macro F1", "Micro F1", "Weighted F1",
+    ]
+
+    base_acc = np.asarray(u_lists['MP'])
+    base_m   = np.asarray(m_lists['MP'])
+
+    summaries = {}
+    for method, acc in u_lists.items():
+        if method == 'MP':
+            continue
+        acc = np.asarray(acc)
+        metr = np.asarray(m_lists[method])
+
+        diffs = np.vstack([acc - base_acc, metr - base_m])
+        summary = {}
+        for name, arr in zip(metric_names, diffs):
+            arr = np.where(np.isnan(arr), 0.0, arr)
+            avg_all = float(np.mean(arr)) if arr.size else float('nan')
+            max_all = float(np.max(arr)) if arr.size else float('nan')
+            mask = acc > threshold
+            if mask.any():
+                avg90 = float(np.mean(arr[mask]))
+            else:
+                avg90 = float('nan')
+            summary[name] = {
+                'avg90': avg90,
+                'avg_all': avg_all,
+                'max_all': max_all,
+            }
+        summaries[method] = summary
+
+    return summaries
+
+
+def save_results_json(u_lists, m_lists, c_lists, diff_summary, out_path):
+    """Save arrays and metric comparisons to a JSON file."""
+
+    def conv(d):
+        return {k: np.asarray(v).tolist() for k, v in d.items()}
+
+    data = {
+        'u_lists': conv(u_lists),
+        'm_lists': conv(m_lists),
+        'c_lists': conv(c_lists),
+        'diff_summary': diff_summary,
+    }
+
+    with open(out_path, 'w') as f:
+        json.dump(data, f, indent=2)
+
 
