@@ -5,10 +5,12 @@ import kaggle
 
 DATASETS = {
     "credit_score": "parisrohan/credit-score-classification",
-    # Correct dataset identifier includes a dash between "depressive" and "non"
-    "tweets": "mexwell/depressive-non-depressive-tweets-data",
+    "tweets": "mexwell/depressivenon-depressive-tweets-data",
     "ai_vs_human": "shanegerami/ai-vs-human-text",
     "neo": "ivansher/nasa-nearest-earth-objects-1910-2024",
+    "fraud_detection": "mlg-ulb/creditcardfraud",
+    "rice_type": "mssmartypants/rice-type-classification",
+    "smoke_detection": "deepcontractor/smoke-detection-dataset"
 }
 
 
