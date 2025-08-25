@@ -83,3 +83,7 @@ history = model.fit(
 )
 
 model.save('./datasets/fraud_detection/fd.keras')
+
+score = model.evaluate(X_test, y_test, verbose=0)
+print("Test loss:", score[0])
+print("Test accuracy:", score[1])

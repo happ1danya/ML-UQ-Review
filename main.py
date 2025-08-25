@@ -7,6 +7,9 @@ from utils import (
     run_mc_dropout,
     misclassification_probability,
     entropy,
+    entropy_mean,
+    mean_entropy,
+    max_entropy,
     std_predicted_prob,
     compute_truth_flags,
     build_bins_from_arrays,
@@ -34,14 +37,17 @@ def main():
     flags_mc = compute_truth_flags(y, preds_mc)
 
 
-    mp, mp_mc = misclassification_probability(obs)
-    ent, ent_mc = entropy(obs)
+    mp, mp_mean = misclassification_probability(obs)
+    ent = entropy(obs)
+    mean_ent = mean_entropy(obs)
+    ent_mean = entropy_mean(obs)
+    max_ent = max_entropy(obs)
     dpp = std_predicted_prob(obs)
 
 
     u_lists, m_lists, c_lists = build_bins_from_arrays(
         y,
-        mp=mp, mp_mc=mp_mc, ent=ent, ent_mc=ent_mc, dpp=dpp,
+        mp=mp, mp_mean=mp_mean, ent=ent, mean_ent=mean_ent, ent_mean=ent_mean, max_ent=max_ent, dpp=dpp,
         preds0=preds0, preds_mc=preds_mc,
         flags0=flags0, flags_mc=flags_mc,
         slices=10

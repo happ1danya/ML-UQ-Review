@@ -9,18 +9,36 @@ from sklearn.metrics import (
 )
 import json
 
+# def cal_bin(uc, truth_flags, slices=10, return_rate=True):
+#     """Per-bin accuracy *or* count, NaN for empty bins."""
+#     edges   = np.linspace(0, 1, slices + 1)
+#     results = []
+#     for k in range(slices):
+#         sel = [truth_flags[i] for i, u in enumerate(uc)
+#                if edges[k] <= u < edges[k + 1]]
+#         if return_rate:
+#             results.append(sel.count('T') / len(sel) if sel else np.nan)
+#         else:
+#             results.append(len(sel))
+#     return np.asarray(results, dtype=float)
+
 def cal_bin(uc, truth_flags, slices=10, return_rate=True):
     """Per-bin accuracy *or* count, NaN for empty bins."""
     edges   = np.linspace(0, 1, slices + 1)
     results = []
     for k in range(slices):
-        sel = [truth_flags[i] for i, u in enumerate(uc)
-               if edges[k] <= u < edges[k + 1]]
+        if k == slices - 1:
+            sel = [truth_flags[i] for i, u in enumerate(uc)
+                   if edges[k] <= u <= edges[k + 1]]
+        else:
+            sel = [truth_flags[i] for i, u in enumerate(uc)
+                   if edges[k] <= u < edges[k + 1]]
         if return_rate:
             results.append(sel.count('T') / len(sel) if sel else np.nan)
         else:
             results.append(len(sel))
     return np.asarray(results, dtype=float)
+
 
 def cal_bin_counts(uc, truth_flags, slices=10):
     return cal_bin(uc, truth_flags, slices, return_rate=False)
@@ -59,7 +77,7 @@ def cal_bin_others(y_true_bins, preds_bins):
 def build_bins_from_arrays(
     y_onehot,
     *,
-    mp, mp_mc, ent, ent_mc, dpp,
+    mp, mp_mean, ent, mean_ent, ent_mean, max_ent, dpp,
     preds0, preds_mc,
     flags0, flags_mc,
     slices: int = 10
@@ -71,16 +89,20 @@ def build_bins_from_arrays(
     # --- accuracy curves & instance counts --------------------------
     u_lists = {
         'MP'        : cal_bin(mp,        flags0, slices),
-        'MP_MC'     : cal_bin(mp_mc,     flags_mc, slices),
+        'MP_Mean'     : cal_bin(mp_mean,     flags_mc, slices),
         'Entropy'   : cal_bin(ent,       flags0, slices),
-        'Entropy_MC': cal_bin(ent_mc,    flags_mc, slices),
+        'Mean_Entropy'   : cal_bin(mean_ent,       flags_mc, slices),
+        'Entropy_Mean': cal_bin(ent_mean,    flags_mc, slices),
+        'Max_Entropy'   : cal_bin(max_ent,       flags_mc, slices),
         'DPP'       : cal_bin(dpp,       flags_mc, slices),
     }
     c_lists = {
         'MP'        : cal_bin_counts(mp,        flags0, slices),
-        'MP_MC'     : cal_bin_counts(mp_mc,     flags_mc, slices),
+        'MP_Mean'     : cal_bin_counts(mp_mean,     flags_mc, slices),
         'Entropy'   : cal_bin_counts(ent,       flags0, slices),
-        'Entropy_MC': cal_bin_counts(ent_mc,    flags_mc, slices),
+        'Mean_Entropy'   : cal_bin_counts(mean_ent,       flags_mc, slices),
+        'Entropy_Mean': cal_bin_counts(ent_mean,    flags_mc, slices),
+        'Max_Entropy'   : cal_bin_counts(max_ent,       flags_mc, slices),
         'DPP'       : cal_bin_counts(dpp,       flags_mc, slices),
     }
 
@@ -89,9 +111,11 @@ def build_bins_from_arrays(
     m_lists   = {}
     for name, (u_arr, preds_arr) in {
         'MP'        : (mp,        preds0),
-        'MP_MC'     : (mp_mc,     preds_mc),
+        'MP_Mean'     : (mp_mean,     preds_mc),
         'Entropy'   : (ent,       preds0),
-        'Entropy_MC': (ent_mc,    preds_mc),
+        'Mean_Entropy'   : (mean_ent,      preds_mc),
+        'Entropy_Mean': (ent_mean,   preds_mc),
+        'Max_Entropy'   : (max_ent,     preds_mc),
         'DPP'       : (dpp,       preds_mc)
     }.items():
         y_true_bins, y_pred_bins = grouper(u_arr, gt_labels, preds_arr, slices)
@@ -139,12 +163,12 @@ def summarise_metric_diffs(u_lists, m_lists, threshold=0.9):
             summary[name] = {
                 'avg90': avg90,
                 'avg_all': avg_all,
-                'max_all': max_all,
+                'max_all': max_all,  
             }
+
         summaries[method] = summary
 
     return summaries
-
 
 def save_results_json(u_lists, m_lists, c_lists, diff_summary, out_path):
     """Save arrays and metric comparisons to a JSON file."""

@@ -80,9 +80,9 @@ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accur
 # Train the model
 train_history = model.fit(x=X_train, y=y_train, validation_split=0.2,callbacks=[callback], epochs=3, batch_size=128, verbose=1)
 
-# score = model.evaluate(X_test, y_test, verbose=0)
-# print("Test loss:", score[0])
-# print("Test accuracy:", score[1])
+score = model.evaluate(X_test, y_test, verbose=0)
+print("Test loss:", score[0])
+print("Test accuracy:", score[1])
 
 # # Make predictions on the test set
 # y_pred = model.predict(X_test)

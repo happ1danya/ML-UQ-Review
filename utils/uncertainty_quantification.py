@@ -15,9 +15,29 @@ def entropy(obs):
     base = obs.shape[2]
     p = obs[0]
     ent = -(p * np.log(p) / np.log(base)).sum(axis=1)
+    return ent
+
+def entropy_mean(obs):
+    base = obs.shape[2]
     mc_mean = obs.mean(axis=0)
-    ent_mc = -(mc_mean * np.log(mc_mean) / np.log(base)).sum(axis=1)
-    return ent, ent_mc
+    ent_mean = -(mc_mean * np.log(mc_mean) / np.log(base)).sum(axis=1)
+    return ent_mean
+
+def mean_entropy(obs):
+    base = obs.shape[2]
+    # entropy per draw for each sample: (num_obs, N)
+    ent_per_draw = -(obs * np.log(obs) / np.log(base)).sum(axis=2)
+    # mean over draws: (N,)
+    mean_ent = ent_per_draw.mean(axis=0)
+    return mean_ent
+
+def max_entropy(obs):
+    base = obs.shape[2]
+    # entropy per draw for each sample: (num_obs, N)
+    ent_per_draw = -(obs * np.log(obs) / np.log(base)).sum(axis=2)
+    # mean over draws: (N,)
+    max_ent = ent_per_draw.max(axis=0)
+    return max_ent
 
 def std_predicted_prob(obs):
     preds_mc = obs.mean(axis=0).argmax(axis=1)
