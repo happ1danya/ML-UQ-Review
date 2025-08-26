@@ -3,10 +3,10 @@
 Review and performance evaluation of uncertainty quantification in machine learning assisted measurements.
 
 ## Environment setup
-1. Create and activate a Python virtual environment. One example using `venv`:
+1. Create and activate a Conda environment (either the base environment or a new one). For example, to create an isolated environment named `ml-uq-review`:
    ```bash
-   python3 -m venv venv
-   source venv/bin/activate
+   conda create -n ml-uq-review python=3.10
+   conda activate ml-uq-review
    ```
 2. Install the required packages:
    ```bash
@@ -21,6 +21,17 @@ The project uses Kaggle to obtain benchmark datasets. To download them:
    python datasets/data_downloader.py
    ```
    Each dataset will be extracted under `datasets/<name>`.
+
+## Training models
+After the datasets are downloaded, train the corresponding models:
+
+```bash
+bash train.sh
+```
+
+This script iterates over every dataset and stores the trained model in its
+respective folder. Once training is complete, you can evaluate a dataset with
+`main.py` as described below.
 
 ## Running `main.py`
 `main.py` evaluates a trained model using MC Dropout and generates plots summarising uncertainty metrics.
@@ -43,6 +54,15 @@ In the same directory, a `*_results.json` file captures the arrays used to
 generate the figures. It stores the uncertainty bins (`u_lists`, `m_lists`,
 `c_lists`) and summaries of how each method differs from MP across ten
 classification metrics.
+
+## Evaluating all datasets
+To run `main.py` for every dataset in a single command, use the helper script:
+
+```bash
+bash evaluate.sh
+```
+
+This will sequentially evaluate each dataset using its trained model.
 
 
 ## Directory overview
