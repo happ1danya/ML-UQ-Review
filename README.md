@@ -3,10 +3,14 @@
 Review and performance evaluation of uncertainty quantification in machine learning assisted measurements.
 
 ## Environment setup
-1. Create and activate a Conda environment (either the base environment or a new one). For example, to create an isolated environment named `ml-uq-review`:
+1. Create and activate a Conda environment (either the base environment or a new one). For example, to create an isolated environment named `mluq`:
    ```bash
-   conda create --name ml-uq-review --file requirements.txt
-   conda activate ml-uq-review
+   conda create -n mluq python=3.10
+   conda activate mluq
+   ```
+2. Install the required packages:
+   ```bash
+   pip install -r requirements.txt
    ```
 
 ## Downloading datasets
