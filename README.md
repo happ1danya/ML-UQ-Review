@@ -16,13 +16,39 @@ Review and performance evaluation of uncertainty quantification in machine learn
    ```
 
 ## Downloading datasets
-The project uses Kaggle to obtain benchmark datasets. To download them:
-1. Install and configure the Kaggle command line interface. Follow the [Kaggle API instructions](https://www.kaggle.com/docs/api) to place your `kaggle.json` credentials in `~/.kaggle/`.
-2. Run the downloader script:
-   ```bash
-   python datasets/data_downloader.py
-   ```
-   Each dataset will be extracted under `datasets/<name>`.
+The project uses Kaggle to obtain benchmark datasets. Because the current Kaggle CLI requires Python 3.11 or newer while the main `mluq` environment uses Python 3.10, install the Kaggle CLI in a separate Conda environment:
+
+```bash
+conda create -n kaggle-cli python=3.11 -y
+conda activate kaggle-cli
+pip install kaggle
+```
+
+Generate an API token from your Kaggle account settings, then save the generated `KGAT_...` token to `~/.kaggle/access_token`:
+
+```bash
+mkdir -p ~/.kaggle
+printf '%s' 'YOUR_KAGGLE_API_TOKEN' > ~/.kaggle/access_token
+chmod 600 ~/.kaggle/access_token
+```
+
+Do not commit or share this token. Verify the setup with:
+
+```bash
+kaggle datasets list
+```
+
+From the repository root, run the downloader script:
+
+```bash
+python datasets/data_downloader.py
+```
+
+Each dataset will be extracted under `datasets/<name>`. After downloading the datasets, return to the experiment environment with:
+
+```bash
+conda activate mluq
+```
 
 ## Training models
 After the datasets are downloaded, train the corresponding models:
